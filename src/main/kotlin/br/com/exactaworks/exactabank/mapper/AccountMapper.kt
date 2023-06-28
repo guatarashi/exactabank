@@ -11,7 +11,7 @@ import org.mapstruct.Mappings
 abstract class AccountMapper {
 
     @Mappings(
-        Mapping(target = "id", expression = "java(java.util.UUID.randomUUID().toString())"),
+        Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())"),
         Mapping(target = "accountNumber", expression = "java(generatedAccountNumber())")
         )
     abstract fun requestToAccount(accountRequest: AccountRequest): Account

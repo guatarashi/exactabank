@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("account")
-class AccountInsertController(private val accountService: AccountService) {
+@RequestMapping("accounts")
+class AccountSaveController(private val accountService: AccountService) {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping
-    fun insertAccount(@RequestBody accountRequest: AccountRequest) : AccountResponse {
-        return accountService.insert(accountRequest);
+    fun saveAccount(@RequestBody accountRequest: AccountRequest) : AccountResponse {
+        return accountService.save(accountRequest);
     }
 }

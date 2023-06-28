@@ -1,19 +1,8 @@
 package br.com.exactaworks.exactabank.repository
 
 import br.com.exactaworks.exactabank.repository.entity.Account
-import java.util.UUID
-import org.springframework.stereotype.Repository
+import org.springframework.data.jpa.repository.JpaRepository
 
-@Repository
-class AccountRepository {
+interface AccountRepository: JpaRepository<Account, Long> {
 
-    private val accounts: List<Account> = ArrayList()
-
-    fun insert(account: Account) : Account {
-        account.id = UUID.randomUUID().toString()
-
-        accounts.plus(account)
-
-        return account
-    }
 }
