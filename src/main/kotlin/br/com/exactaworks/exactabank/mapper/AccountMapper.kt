@@ -1,7 +1,9 @@
 package br.com.exactaworks.exactabank.mapper
 
 import br.com.exactaworks.exactabank.controller.request.AccountRequest
+import br.com.exactaworks.exactabank.controller.response.AccountDepositoResponse
 import br.com.exactaworks.exactabank.controller.response.AccountResponse
+import br.com.exactaworks.exactabank.enums.CategoriaEnum
 import br.com.exactaworks.exactabank.repository.entity.Account
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
@@ -17,6 +19,8 @@ abstract class AccountMapper {
     abstract fun requestToAccount(accountRequest: AccountRequest): Account
 
     abstract fun accountToResponse(account: Account): AccountResponse
+
+    abstract fun accountDepositoRequestToAccountDepositoResponse(accountNumber: String?, balance: Double, valor: Double, categoria: CategoriaEnum): AccountDepositoResponse
 
     fun generatedAccountNumber(): String {
         val allowedCharacters = ('A'..'Z')

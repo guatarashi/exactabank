@@ -9,4 +9,9 @@ interface AccountRepository: JpaRepository<Account, Long> {
 
     fun findById(id: UUID) : Optional<Account>
 
+    fun findByAccountNumber(accountNumber: String): Optional<Account>
+
+    fun findByCpf(cpf: String): Optional<Account>
+
+    fun findByEmail(email: String): Optional<Account>
 }

@@ -23,4 +23,18 @@ class ExceptionHandler {
             path = request.servletPath
         )
     }
+
+    @ExceptionHandler(BadRequestException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handlerBadRequest(
+        exception: BadRequestException,
+        request: HttpServletRequest
+    ): ErrorResponse {
+        return ErrorResponse(
+            status = HttpStatus.BAD_REQUEST.value(),
+            error = HttpStatus.BAD_REQUEST.name,
+            message = exception.message,
+            path = request.servletPath
+        )
+    }
 }
