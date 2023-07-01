@@ -14,13 +14,12 @@ abstract class AccountMapper {
 
     @Mappings(
         Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())"),
-        Mapping(target = "accountNumber", expression = "java(generatedAccountNumber())")
+        Mapping(target = "accountNumber", expression = "java(generatedAccountNumber())"),
+        Mapping(target = "balance", ignore = true)
         )
     abstract fun requestToAccount(accountRequest: AccountRequest): Account
 
     abstract fun accountToResponse(account: Account): AccountResponse
-
-    abstract fun accountDepositoRequestToAccountDepositoResponse(accountNumber: String?, balance: Double, valor: Double, categoria: CategoriaEnum): AccountDepositoResponse
 
     fun generatedAccountNumber(): String {
         val allowedCharacters = ('A'..'Z')

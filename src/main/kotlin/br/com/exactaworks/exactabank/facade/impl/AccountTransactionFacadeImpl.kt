@@ -5,14 +5,14 @@ import br.com.exactaworks.exactabank.controller.response.AccountDepositoResponse
 import br.com.exactaworks.exactabank.enums.CategoriaEnum
 import br.com.exactaworks.exactabank.exception.BadRequestException
 import br.com.exactaworks.exactabank.facade.AccountTransactionFacade
-import br.com.exactaworks.exactabank.mapper.AccountMapper
+import br.com.exactaworks.exactabank.mapper.TransactionMapper
 import br.com.exactaworks.exactabank.service.AccountService
 import org.springframework.stereotype.Service
 
 @Service
 class AccountTransactionFacadeImpl(
     private val accountService: AccountService,
-    private val accountMapper: AccountMapper
+    private val transactionMapper: TransactionMapper
 ): AccountTransactionFacade {
 
     override fun depositSwitch(
@@ -23,22 +23,26 @@ class AccountTransactionFacadeImpl(
     ): AccountDepositoResponse {
         // TODO verificar se conta existe
         return if (!accountNumber.isNullOrEmpty() && (email.isNullOrEmpty() && cpf.isNullOrEmpty())) {
-            deposito(accountNumber, accountDepositoRequest)
+            deposito(accountNumber, "conta_corrente", accountDepositoRequest, CategoriaEnum.DEPOSITO)
         } else if (!email.isNullOrEmpty()) {
-            pix(email, "email", accountDepositoRequest)
+            deposito(email, "email", accountDepositoRequest, CategoriaEnum.PIX)
         } else if (!cpf.isNullOrEmpty()) {
-            pix(cpf, "cpf", accountDepositoRequest)
+            deposito(cpf, "cpf", accountDepositoRequest, CategoriaEnum.PIX)
         } else {
             throw BadRequestException("Nenhum documento foi informado")
         }
     }
 
-    fun deposito(accountNumber: String, accountDepositoRequest: AccountDepositoRequest): AccountDepositoResponse {
+    fun deposito(documento: String, tipoDocumento: String, accountDepositoRequest: AccountDepositoRequest, categoria: CategoriaEnum): AccountDepositoResponse {
 
-        val account = accountService.findByAccountNumber(accountNumber)
+        val account = when (tipoDocumento) {
+            "conta_corrente" -> accountService.findByAccountNumber(documento)
+            "email" -> accountService.findByEmail(documento)
+            else -> accountService.findByCpf(documento)
+        }
 
         if (accountDepositoRequest.password != account.password) {
-            return throw BadRequestException("senha inválida")
+            throw BadRequestException("senha inválida")
         }
 
         if (accountDepositoRequest.valor > 0) {
@@ -47,27 +51,6 @@ class AccountTransactionFacadeImpl(
             accountService.save(account)
         }
 
-        return accountMapper.accountDepositoRequestToAccountDepositoResponse(accountNumber, account.balance, accountDepositoRequest.valor, CategoriaEnum.DEPOSITO)
-    }
-
-    fun pix(documento: String, tipoPix: String, accountDepositoRequest: AccountDepositoRequest): AccountDepositoResponse {
-
-        val account = if (tipoPix == "email") {
-            accountService.findByEmail(documento)
-        } else {
-            accountService.findByCpf(documento)
-        }
-
-        if (accountDepositoRequest.password != account.password) {
-            return throw BadRequestException("senha inválida")
-        }
-
-        if (accountDepositoRequest.valor > 0) {
-            account.balance += accountDepositoRequest.valor
-
-            accountService.save(account)
-        }
-
-        return accountMapper.accountDepositoRequestToAccountDepositoResponse(documento, account.balance, accountDepositoRequest.valor, CategoriaEnum.PIX)
+        return transactionMapper.toAccountDepositoResponse(documento, tipoDocumento, account.balance, accountDepositoRequest.valor, categoria)
     }
 }
